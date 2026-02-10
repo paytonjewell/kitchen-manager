@@ -6,6 +6,7 @@ import { MealPlanView } from './pages/MealPlanView';
 import { ShoppingListView } from './pages/ShoppingListView';
 import { RecipeDetailView } from './pages/RecipeDetailView';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { ComponentShowcase } from './components/examples/ComponentShowcase';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="meal-plan" element={<MealPlanView />} />
           <Route path="shopping-list" element={<ShoppingListView />} />
           <Route path="recipe/:id" element={<RecipeDetailView />} />
+          <Route path="components" element={<ComponentShowcase />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
