@@ -62,7 +62,7 @@ router.get(
 router.get(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const recipe = await recipeService.getRecipeById(id);
 
@@ -112,7 +112,7 @@ router.post(
 router.put(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     try {
       // Validate request body
@@ -150,7 +150,7 @@ router.put(
 router.delete(
   '/:id',
   asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const deleted = await recipeService.deleteRecipe(id);
 
@@ -172,7 +172,7 @@ router.delete(
 router.patch(
   '/:id/favorite',
   asyncHandler(async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const recipe = await recipeService.toggleFavorite(id);
 

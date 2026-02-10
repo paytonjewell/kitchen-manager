@@ -2,7 +2,6 @@ import type {
   Recipe,
   RecipeIngredient,
   RecipeStep,
-  RecipeTag,
 } from '../db/schema.js';
 
 /**
@@ -76,9 +75,5 @@ export interface CreateRecipeInput {
   tags?: string[];
 }
 
-/**
- * Input for updating an existing recipe
- */
-export interface UpdateRecipeInput extends CreateRecipeInput {
-  id: string;
-}
+// UpdateRecipeInput is now exported from the validator
+// (No longer needed here as it's just CreateRecipeInput)

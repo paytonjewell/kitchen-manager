@@ -23,6 +23,10 @@ async function seed() {
       })
       .returning();
 
+    if (!recipe) {
+      throw new Error('Failed to create recipe');
+    }
+
     console.log('Created recipe:', recipe.title);
 
     // Insert ingredients for the recipe

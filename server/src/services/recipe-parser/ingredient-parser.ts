@@ -38,10 +38,9 @@ const UNITS = [
  * - "2 lbs chicken breast, boneless skinless" => { quantity: "2", unit: "lbs", ingredient_name: "chicken breast", notes: "boneless skinless" }
  *
  * @param ingredientString Raw ingredient string
- * @param orderIndex Order index for the ingredient
  * @returns Parsed ingredient data
  */
-export function parseIngredient(ingredientString: string, orderIndex: number): ParsedIngredient {
+export function parseIngredient(ingredientString: string): ParsedIngredient {
   if (!ingredientString || typeof ingredientString !== 'string') {
     return {
       ingredient_name: '',
@@ -57,19 +56,30 @@ export function parseIngredient(ingredientString: string, orderIndex: number): P
   const [mainPart, ...notesParts] = trimmed.split(',');
   const notes = notesParts.length > 0 ? notesParts.join(',').trim() : undefined;
 
+  if (!mainPart || mainPart.trim().length === 0) {
+    return {
+      ingredient_name: '',
+      quantity: undefined,
+      unit: undefined,
+      notes: undefined,
+    };
+  }
+
+  const mainPartTrimmed = mainPart.trim();
+
   // Try to extract quantity and unit
   // Pattern: number(s) + optional unit + ingredient name
   // Numbers can be: 1, 1.5, 1/2, 1 1/2, etc.
   const quantityPattern = /^(\d+(?:[\s\/]\d+)?(?:\.\d+)?)\s*/;
-  const quantityMatch = mainPart.match(quantityPattern);
+  const quantityMatch = mainPartTrimmed.match(quantityPattern);
 
   let quantity: string | undefined;
   let unit: string | undefined;
   let ingredientName: string;
 
-  if (quantityMatch) {
+  if (quantityMatch && quantityMatch[1]) {
     quantity = quantityMatch[1].trim();
-    const remaining = mainPart.slice(quantityMatch[0].length).trim();
+    const remaining = mainPartTrimmed.slice(quantityMatch[0].length).trim();
 
     // Try to find a unit at the start of the remaining string
     const unitMatch = UNITS.find(u => {
@@ -85,7 +95,7 @@ export function parseIngredient(ingredientString: string, orderIndex: number): P
     }
   } else {
     // No quantity found, entire main part is the ingredient
-    ingredientName = mainPart.trim();
+    ingredientName = mainPartTrimmed;
   }
 
   return {
@@ -109,5 +119,5 @@ export function parseIngredients(ingredients: string[]): ParsedIngredient[] {
 
   return ingredients
     .filter(ing => ing && typeof ing === 'string' && ing.trim().length > 0)
-    .map((ing, index) => parseIngredient(ing, index));
+    .map((ing) => parseIngredient(ing));
 }

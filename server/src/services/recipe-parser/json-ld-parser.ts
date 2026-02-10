@@ -179,7 +179,7 @@ function extractServings(recipeYield: unknown): number | undefined {
   // String like "4 servings" or "4"
   if (typeof recipeYield === 'string') {
     const match = recipeYield.match(/(\d+)/);
-    if (match) {
+    if (match && match[1]) {
       return parseInt(match[1], 10);
     }
   }
@@ -261,6 +261,10 @@ export async function parseRecipeFromURL(
 
     // Take the first recipe
     const recipe = recipes[0];
+    if (!recipe) {
+      console.log('No valid recipe data found');
+      return null;
+    }
 
     // Parse into our format
     const parsed = parseSchemaOrgRecipe(recipe, url);
@@ -296,7 +300,13 @@ export function parseRecipeFromHTML(html: string, sourceUrl: string): ParsedReci
 
     console.log(`Found ${recipes.length} JSON-LD recipe(s), using the first one`);
 
-    const parsed = parseSchemaOrgRecipe(recipes[0], sourceUrl);
+    const recipe = recipes[0];
+    if (!recipe) {
+      console.log('No valid recipe data found');
+      return null;
+    }
+
+    const parsed = parseSchemaOrgRecipe(recipe, sourceUrl);
 
     if (parsed) {
       console.log(`Successfully parsed recipe: ${parsed.title}`);
