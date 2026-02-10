@@ -14,6 +14,7 @@ import type {
 } from './types.js';
 import { parseTimes } from './duration-parser.js';
 import { parseIngredients } from './ingredient-parser.js';
+import { parseDOMRecipe } from './dom-parser.js';
 
 /**
  * Fetch HTML content from a URL
@@ -249,31 +250,25 @@ export async function parseRecipeFromURL(
     // Fetch HTML
     const html = await fetchHTML(url, options);
 
-    // Extract JSON-LD recipes
+    // Try JSON-LD first
     const recipes = extractJSONLD(html);
 
-    if (recipes.length === 0) {
-      console.log('No JSON-LD recipes found in HTML');
-      return null;
+    if (recipes.length > 0) {
+      console.log(`Found ${recipes.length} JSON-LD recipe(s), using the first one`);
+
+      const recipe = recipes[0];
+      if (recipe) {
+        const parsed = parseSchemaOrgRecipe(recipe, url);
+        if (parsed) {
+          console.log(`Successfully parsed recipe via JSON-LD: ${parsed.title}`);
+          return parsed;
+        }
+      }
     }
 
-    console.log(`Found ${recipes.length} JSON-LD recipe(s), using the first one`);
-
-    // Take the first recipe
-    const recipe = recipes[0];
-    if (!recipe) {
-      console.log('No valid recipe data found');
-      return null;
-    }
-
-    // Parse into our format
-    const parsed = parseSchemaOrgRecipe(recipe, url);
-
-    if (parsed) {
-      console.log(`Successfully parsed recipe: ${parsed.title}`);
-    }
-
-    return parsed;
+    // Fall back to DOM parsing
+    console.log('No JSON-LD recipes found, falling back to DOM parsing');
+    return parseDOMRecipe(html, url);
   } catch (error) {
     console.error('Error parsing recipe:', error);
     throw error;
@@ -291,28 +286,25 @@ export function parseRecipeFromHTML(html: string, sourceUrl: string): ParsedReci
   console.log(`Parsing recipe from HTML for: ${sourceUrl}`);
 
   try {
+    // Try JSON-LD first
     const recipes = extractJSONLD(html);
 
-    if (recipes.length === 0) {
-      console.log('No JSON-LD recipes found in HTML');
-      return null;
+    if (recipes.length > 0) {
+      console.log(`Found ${recipes.length} JSON-LD recipe(s), using the first one`);
+
+      const recipe = recipes[0];
+      if (recipe) {
+        const parsed = parseSchemaOrgRecipe(recipe, sourceUrl);
+        if (parsed) {
+          console.log(`Successfully parsed recipe via JSON-LD: ${parsed.title}`);
+          return parsed;
+        }
+      }
     }
 
-    console.log(`Found ${recipes.length} JSON-LD recipe(s), using the first one`);
-
-    const recipe = recipes[0];
-    if (!recipe) {
-      console.log('No valid recipe data found');
-      return null;
-    }
-
-    const parsed = parseSchemaOrgRecipe(recipe, sourceUrl);
-
-    if (parsed) {
-      console.log(`Successfully parsed recipe: ${parsed.title}`);
-    }
-
-    return parsed;
+    // Fall back to DOM parsing
+    console.log('No JSON-LD recipes found, falling back to DOM parsing');
+    return parseDOMRecipe(html, sourceUrl);
   } catch (error) {
     console.error('Error parsing recipe from HTML:', error);
     return null;
