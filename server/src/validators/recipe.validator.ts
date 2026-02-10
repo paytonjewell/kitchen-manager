@@ -39,8 +39,22 @@ export const createRecipeSchema = z.object({
 
 /**
  * Validator for updating a recipe
+ * Note: isFavorite does not have a default to preserve existing value when not provided
  */
-export const updateRecipeSchema = createRecipeSchema;
+export const updateRecipeSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200, 'Title must be 200 characters or less'),
+  description: z.string().optional(),
+  sourceUrl: z.string().url('Invalid URL').optional().or(z.literal('')),
+  imageUrl: z.string().url('Invalid URL').optional().or(z.literal('')),
+  prepTimeMinutes: z.number().int().min(0).optional(),
+  cookTimeMinutes: z.number().int().min(0).optional(),
+  servings: z.number().int().min(1).optional(),
+  notes: z.string().optional(),
+  isFavorite: z.boolean().optional(),
+  ingredients: z.array(recipeIngredientSchema).min(1, 'At least one ingredient is required'),
+  steps: z.array(recipeStepSchema).min(1, 'At least one step is required'),
+  tags: z.array(z.string()).optional().default([]),
+});
 
 /**
  * Validator for recipe list query parameters
