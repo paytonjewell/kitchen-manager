@@ -100,28 +100,6 @@ router.post(
 );
 
 /**
- * DELETE /api/inventory/:id - Remove single inventory item
- */
-router.delete(
-  '/:id',
-  asyncHandler(async (req: Request, res: Response) => {
-    const id = req.params.id as string;
-
-    const deleted = await inventoryService.deleteInventoryItem(id);
-
-    if (!deleted) {
-      res.status(404).json({
-        status: 'error',
-        message: 'Inventory item not found',
-      });
-      return;
-    }
-
-    res.status(204).send();
-  })
-);
-
-/**
  * DELETE /api/inventory/bulk - Remove multiple inventory items
  */
 router.delete(
@@ -149,6 +127,28 @@ router.delete(
       }
       throw error;
     }
+  })
+);
+
+/**
+ * DELETE /api/inventory/:id - Remove single inventory item
+ */
+router.delete(
+  '/:id',
+  asyncHandler(async (req: Request, res: Response) => {
+    const id = req.params.id as string;
+
+    const deleted = await inventoryService.deleteInventoryItem(id);
+
+    if (!deleted) {
+      res.status(404).json({
+        status: 'error',
+        message: 'Inventory item not found',
+      });
+      return;
+    }
+
+    res.status(204).send();
   })
 );
 

@@ -53,7 +53,18 @@ function singularize(word: string): string {
     // knives -> knife, loaves -> loaf
     return word.slice(0, -3) + 'f';
   } else if (word.endsWith('ses')) {
-    // tomatoes -> tomato (but actually 'tomatoses' -> 'tomatos')
+    // Special cases for words ending in 'se' (cheese, mousse, etc.)
+    const baseWithoutS = word.slice(0, -1);
+    if (
+      baseWithoutS.endsWith('eese') || // cheeses -> cheese
+      baseWithoutS.endsWith('ousse') || // mousses -> mousse
+      baseWithoutS.endsWith('urse') || // courses -> course
+      baseWithoutS.endsWith('orse') || // horses -> horse (not a food, but for completeness)
+      baseWithoutS.endsWith('pulse') // pulses -> pulse
+    ) {
+      return baseWithoutS;
+    }
+    // Default: glasses -> glass, bases -> base
     return word.slice(0, -2);
   } else if (word.endsWith('es')) {
     // Check if it's a word that needs 'es' removed
